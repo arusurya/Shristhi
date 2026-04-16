@@ -183,7 +183,7 @@ def simulate_mess_data(n_days: int = 90, seed: int = 42, include_snacks: bool = 
                 ts = slot_start + timedelta(minutes=int(offset))
                 records.append({
                     "timestamp":   ts,
-                    "date":        current_date.date(),
+                    "date": pd.to_datetime(current_date),
                     "meal_slot":   slot_name,
                     "hour":        ts.hour,
                     "minute":      ts.minute,
@@ -572,12 +572,18 @@ if section == "🏠 Overview":
         "Breakfast": "#FF9800", "Lunch": "#2196F3",
         "Snacks":    "#4CAF50", "Dinner": "#9C27B0",
     }
+    daily_df["date"] = pd.to_datetime(daily_df["date"])
     fig = px.line(
         daily_df, x="date", y="students", color="meal_slot",
         color_discrete_map=slot_colors,
         labels={"students": "Students", "date": "Date", "meal_slot": "Meal Slot"},
     )
     fig.update_layout(height=360, margin=dict(l=0, r=0, t=20, b=0), legend_title="")
+    fig.update_xaxes(
+    type="date",
+    tickformat="%d %b",
+    nticks=8
+)
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("Slot distribution — total across 90 days")
